@@ -1,0 +1,22 @@
+{
+  "name": "bootstrapper",
+  "version": "1.0.0",
+  "builtin-baseline": "4bb07a326d9b9bce3703272a509e5bc25dd9cfd5",
+  "dependencies": [
+    "boost-asio",
+    "boost-foreach",
+    "boost-lexical-cast",
+    "boost-lexical-cast",
+    "boost-property-tree",
+    "boost-thread",
+    {
+      "name": "cpr",
+      "features": [
+        "ssl"
+      ]
+    },
+    "rapidjson",
+    "zlib",
+    "minizip"
+  ]
+}
