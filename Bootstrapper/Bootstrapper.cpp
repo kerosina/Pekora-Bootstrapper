@@ -1093,7 +1093,8 @@ void Bootstrapper::RegisterProtocolHandler(const std::wstring& protocolScheme, c
 
 	// query and remove what's already installed
 	CRegKey installKey;
-	if (ERROR_SUCCESS==installKey.Open(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, installKeyRegPath.c_str(), KEY_READ | KEY_WRITE))
+	// Always use user-level registry to avoid permission issues
+	if (ERROR_SUCCESS==installKey.Open(HKEY_CURRENT_USER, installKeyRegPath.c_str(), KEY_READ | KEY_WRITE))
 	{
 		std::string result;
 		result = QueryStringValue(installKey, _T("protocol handler scheme"));
@@ -1106,7 +1107,8 @@ void Bootstrapper::RegisterProtocolHandler(const std::wstring& protocolScheme, c
 	}
 
 	// register the protocol handler scheme
-	auto key = CreateKey(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, (_T("SOFTWARE\\Classes\\") + protocolScheme).c_str());
+	// Always use user-level registry to avoid permission issues
+	auto key = CreateKey(HKEY_CURRENT_USER, (_T("SOFTWARE\\Classes\\") + protocolScheme).c_str());
 	throwHRESULT(key->SetStringValue(_T(""), _T("URL: Pekora2 Protocol")), format_string("failed to set value for protocol"));
 	throwHRESULT(key->SetStringValue(_T("URL Protocol"), _T("")), format_string("failed to set value for protocol"));
 
@@ -1132,7 +1134,8 @@ void Bootstrapper::RegisterProtocolHandler(const std::wstring& protocolScheme, c
 
 void Bootstrapper::UnregisterProtocolHandler(const std::wstring& protocolScheme)
 {
-	CRegKey hk(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE);
+	// Always use user-level registry to avoid permission issues
+	CRegKey hk(HKEY_CURRENT_USER);
 	std::wstring path = _T("SOFTWARE\\Classes\\");
 	path += protocolScheme;
 	hk.RecurseDeleteKey(path.c_str());
@@ -1304,7 +1307,9 @@ std::wstring Bootstrapper::programDirectory() const
 
 std::wstring Bootstrapper::baseProgramDirectory(bool isPerUser) const
 {
-	return FileSystem::getSpecialFolder(isPerUser ? FileSystem::RobloxUserApplicationData : FileSystem::RobloxProgramFiles, true, "Versions");
+	// Always use user-level AppData\Local to avoid permission issues
+	// This ensures installations work without requiring elevated privileges
+	return FileSystem::getSpecialFolder(FileSystem::RobloxUserApplicationData, true, "Versions");
 }
 
 std::wstring Bootstrapper::programDirectory(bool isPerUser) const
@@ -2490,7 +2495,7 @@ void Bootstrapper::deleteVersionsDirectoryContents()
 	try
 	{
 		// Clear out old versions as much as possible
-		std::wstring dir = FileSystem::getSpecialFolder(perUser ? FileSystem::RobloxUserApplicationData : FileSystem::RobloxProgramFiles, true, "Versions");
+		std::wstring dir = FileSystem::getSpecialFolder(FileSystem::RobloxUserApplicationData, true, "Versions");
 		deleteDirectory(dir, true);
 	}
 	catch (cancel_exception&)
@@ -2522,7 +2527,7 @@ void Bootstrapper::deleteVersionFolder(std::string version)
 		return;
 	}
 
-	std::wstring dir = FileSystem::getSpecialFolder(perUser ? FileSystem::RobloxUserApplicationData : FileSystem::RobloxProgramFiles, false, "Versions");
+	std::wstring dir = FileSystem::getSpecialFolder(FileSystem::RobloxUserApplicationData, false, "Versions");
 	if (dir.empty())
 	{
 		return;
@@ -2552,7 +2557,7 @@ void Bootstrapper::DeleteOldVersionsDirectories()
 	try
 	{
 		// Clear out old versions as much as possible
-		std::wstring dir = FileSystem::getSpecialFolder(perUser ? FileSystem::RobloxUserApplicationData : FileSystem::RobloxProgramFiles, false, "Versions");
+		std::wstring dir = FileSystem::getSpecialFolder(FileSystem::RobloxUserApplicationData, false, "Versions");
 		if (dir.empty())
 			return;
 		WIN32_FIND_DATA FileInformation;             // File information
@@ -2631,7 +2636,8 @@ std::wstring Bootstrapper::prevVersionValueKey(int index)
 void Bootstrapper::loadPrevVersions()
 {
 	std::wstring keyPath = prevVersionRegKey();
-	auto versionsKey = CreateKey(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, keyPath.c_str());
+	// Always use user-level registry to avoid permission issues
+	auto versionsKey = CreateKey(HKEY_CURRENT_USER, keyPath.c_str());
 	LOG_ENTRY1("Bootstrapper::loadPrevVersions path = %S", keyPath.c_str());
 
 	int i = 0;
@@ -2654,7 +2660,8 @@ void Bootstrapper::loadPrevVersions()
 void Bootstrapper::storePrevVersions()
 {
 	std::wstring keyPath = prevVersionRegKey();
-	auto versionsKey = CreateKey(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, keyPath.c_str());
+	// Always use user-level registry to avoid permission issues
+	auto versionsKey = CreateKey(HKEY_CURRENT_USER, keyPath.c_str());
 	LOG_ENTRY2("Bootstrapper::storePrevVersions path = %S, perUser = %d", keyPath.c_str(), isPerUser());
 
 	int i = 0;

@@ -22,11 +22,13 @@ FileDeployer::FileDeployer(IInstallerSite *site, bool perUser)
 // Downloads a file from the install site. Uses a cached file when possible
 std::wstring FileDeployer::downloadVersionedFile(const TCHAR* name, Progress& progress, bool usePrimaryCdn)
 {
-	std::wstring downloadsDirectory = FileSystem::getSpecialFolder(_perUser ? FileSystem::RobloxUserApplicationData : FileSystem::RobloxCommonApplicationData, true, "Downloads");
+	// Always use user-level AppData\Local for downloads to avoid permission issues
+	std::wstring downloadsDirectory = FileSystem::getSpecialFolder(FileSystem::RobloxUserApplicationData, true, "Downloads");
 	if (downloadsDirectory.empty())
 		throw std::runtime_error("Failed to create Downloads folder"); 
 
-	auto key = CreateKey(_perUser ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, _T("Software\\PekoraReg\\ETags"));
+	// Always use user-level registry to avoid permission issues
+	auto key = CreateKey(HKEY_CURRENT_USER, _T("Software\\PekoraReg\\ETags"));
 
 	std::string etag = QueryStringValue(key, name);
 
@@ -235,7 +237,8 @@ void FileDeployer::cleanupVersionedFile(const std::wstring& name, const std::wst
 		}
 
 		//Clear out the etag registry cache, just in case our file delete did not work
-		auto key = CreateKey(_perUser ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, _T("Software\\PekoraReg\\ETags"));
+		// Always use user-level registry to avoid permission issues
+	auto key = CreateKey(HKEY_CURRENT_USER, _T("Software\\PekoraReg\\ETags"));
 		key->SetStringValue(name.c_str(), _T(""));
 	}
 	catch(std::exception&)

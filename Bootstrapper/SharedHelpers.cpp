@@ -364,7 +364,7 @@ void createRobloxShortcut(simple_logger<wchar_t> &logger, bool isPerUser, const 
 	std::wstring shortcutsDirectory;
 	if (!desktop)
 	{
-		shortcutsDirectory = FileSystem::getSpecialFolder(isPerUser ? FileSystem::RobloxUserPrograms : FileSystem::RobloxCommonPrograms, true);
+		shortcutsDirectory = FileSystem::getSpecialFolder(FileSystem::RobloxUserPrograms, true);
 	}
 	else
 	{
@@ -538,7 +538,7 @@ bool hasDesktopShortcut(simple_logger<wchar_t> &logger, const TCHAR *shortcutNam
 
 std::wstring getRobloxProgramsFolder(simple_logger<wchar_t> &logger, bool isPerUser)
 {
-	return FileSystem::getSpecialFolder(isPerUser ? FileSystem::RobloxUserPrograms : FileSystem::RobloxCommonPrograms, false);
+	return FileSystem::getSpecialFolder(FileSystem::RobloxUserPrograms, false);
 }
 
 bool hasProgramShortcut(simple_logger<wchar_t> &logger, bool isPerUser, const TCHAR *shortcutName)
@@ -580,7 +580,7 @@ void deleteProgramsShortcut(simple_logger<wchar_t> &logger, bool isPerUser, cons
 {
 	LOG_ENTRY1("deleteProgramsShortcut - %S", shortcutName);
 
-	std::wstring shortcutsDirectory = FileSystem::getSpecialFolder(isPerUser ? FileSystem::RobloxUserPrograms : FileSystem::RobloxCommonPrograms, false);
+	std::wstring shortcutsDirectory = FileSystem::getSpecialFolder(FileSystem::RobloxUserPrograms, false);
 	if (!shortcutsDirectory.empty())
 	{
 		CString szLinkName;

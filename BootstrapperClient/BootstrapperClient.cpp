@@ -922,7 +922,8 @@ void BootstrapperClient::deployExtraStudioBootstrapper(std::string exeName, cons
 
 		// create registry info, so we can launch properly from web
         std::wstring progName = convert_s2w(exeName);
-		auto installKey = CreateKey(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, registryPath, (baseProgramDirectory(isPerUser()) + progName).c_str());
+		// Always use user-level registry to avoid permission issues
+		auto installKey = CreateKey(HKEY_CURRENT_USER, registryPath, (baseProgramDirectory(isPerUser()) + progName).c_str());
 		throwHRESULT(installKey->SetStringValue(_T("install host"), convert_s2w(InstallHost()).c_str()), "Failed to set install host key value");
 		// update registry to point to stub studio bootstrapper
 		HKEY curKey = HKEY_LOCAL_MACHINE;
@@ -1002,7 +1003,8 @@ void BootstrapperClient::deployRobloxProxy(bool commitData)
 
 	// create the 64 bit keys
 	CRegKey classesKey64;
-	throwHRESULT(classesKey64.Create(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, _T("Software\\Classes"), REG_NONE, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY), "Failed to create 64 bits HK**\\Software\\Classes");
+	// Always use user-level registry to avoid permission issues
+	throwHRESULT(classesKey64.Create(HKEY_CURRENT_USER, _T("Software\\Classes"), REG_NONE, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY), "Failed to create 64 bits HK**\\Software\\Classes");
 	LOG_ENTRY1("classesKey64 = %s\\Software\\Classes", (isPerUser() ? "HKEY_CURRENT_USER" : "HKEY_LOCAL_MACHINE"));
 	proxyModule64.registerModule(classesKey64, programDirectory(), logger);
 
@@ -1025,7 +1027,8 @@ void BootstrapperClient::deployRobloxProxy(bool commitData)
 	{
 		std::string version = vi.GetFileVersionAsString();
 		CRegKey installKey;
-		if (!FAILED(installKey.Open(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, GetRegistryPath().c_str())))
+		// Always use user-level registry to avoid permission issues
+		if (!FAILED(installKey.Open(HKEY_CURRENT_USER, GetRegistryPath().c_str())))
 			installKey.SetStringValue(_T("Plug-in version"), convert_s2w(version).c_str());
 	}
 }
@@ -1125,7 +1128,8 @@ void BootstrapperClient::DoInstallApp()
 
 	// "install key" and "install host" must be set before RobloxProxy is deployed, because RobloxProxy uses these values
 	LOG_ENTRY("set install key");
-	auto installKey = CreateKey(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, GetRegistryPath().c_str(), (programDirectory() + BootstrapperFileName).c_str());
+	// Always use user-level registry to avoid permission issues
+	auto installKey = CreateKey(HKEY_CURRENT_USER, GetRegistryPath().c_str(), (programDirectory() + BootstrapperFileName).c_str());
 	LOG_ENTRY("set install host key value");
 	throwHRESULT(installKey->SetStringValue(_T("install host"), convert_s2w(InstallHost()).c_str()), "Failed to set install host key value");
 	CheckCancel();
@@ -1222,7 +1226,8 @@ void BootstrapperClient::DoUninstallApp(CRegKey &hk)
 
 		// unregister 64 bit proxy module
 		CRegKey classesKey64;
-		if (!FAILED(classesKey64.Open(isPerUser() ? HKEY_CURRENT_USER : HKEY_LOCAL_MACHINE, _T("Software\\Classes"), KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)))
+		// Always use user-level registry to avoid permission issues
+		if (!FAILED(classesKey64.Open(HKEY_CURRENT_USER, _T("Software\\Classes"), KEY_READ | KEY_WRITE | KEY_WOW64_64KEY)))
 		{
 			proxyModule64.unregisterModule(classesKey64, isPerUser(), logger);
 		}
