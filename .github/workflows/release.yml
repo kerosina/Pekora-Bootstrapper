@@ -26,29 +26,16 @@ jobs:
         
     - name: Build for Windows
       run: cargo build --release --target x86_64-pc-windows-gnu
-      
-    - name: Get version from tag
-      id: version
-      run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
-      
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
+    - name: Publish release (create or update, overwrite assets)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ steps.version.outputs.VERSION }}
-        release_name: Release ${{ steps.version.outputs.VERSION }}
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
         draft: false
         prerelease: false
-        
-    - name: Upload Release Asset
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: actions/upload-release-asset@v1
+        files: ./target/x86_64-pc-windows-gnu/release/pekora-bootstrapper.exe
+        overwrite: true
       env:
         GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./target/x86_64-pc-windows-gnu/release/pekora-bootstrapper.exe
-        asset_name: pekora-bootstrapper.exe
-        asset_content_type: application/octet-stream
