@@ -1,0 +1,22 @@
+[package]
+name = "pekora-bootstrapper"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.99"
+figlet-rs = "0.1.5"
+open = "5.3.2"
+paris = { version = "1.5.15", features = ["macros", "timestamps"] }
+regex = "1.11.2"
+reqwest = "0.12.23"
+termcolor = "1.4.1"
+tokio = { version = "1.47.1", features = ["full"] }
+windows-registry = "0.6.0"
+zip = "5.0.0"
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
