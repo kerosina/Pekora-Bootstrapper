@@ -28,7 +28,7 @@ async fn main() {
     stdout
         .set_color(ColorSpec::new().set_fg(Some(Color::Blue)).set_dimmed(true))
         .unwrap();
-    write!(&mut stdout, "pekora.org").unwrap();
+    write!(&mut stdout, "pekora.rip").unwrap();
     stdout.reset().unwrap();
     println!();
 

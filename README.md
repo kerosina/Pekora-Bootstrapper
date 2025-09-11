@@ -1,5 +1,5 @@
 # Pekora bootstrapper
-Bootstrapper for [pekora.org](https://pekora.org/auth/home). Rewritten to be faster and less buggy, along with providing more debugging information for any bugs that may arise.
+Bootstrapper for [pekora.rip](https://pekora.rip/auth/home). Rewritten to be faster and less buggy, along with providing more debugging information for any bugs that may arise.
 ## Install
 Download the latest version of the bootstrapper from [releases](https://github.com/kerosina/Pekora-Bootstrapper/releases). These binaries are compiled directly from source through Github Actions, and so are verifiably built from the code on this repository.
 ## Compiling

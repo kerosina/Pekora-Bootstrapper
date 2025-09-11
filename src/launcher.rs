@@ -44,7 +44,7 @@ pub async fn launch(uri: &str) -> Result<()> {
     )
     .arg("--play")
     .arg("-a")
-    .arg("https://www.pekora.org/Login/Negotiate.ashx")
+    .arg("https://www.pekora.rip/Login/Negotiate.ashx")
     .arg("-t")
     .arg(args.game_info)
     .arg("-j")
